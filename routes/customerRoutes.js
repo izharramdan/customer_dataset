@@ -11,8 +11,8 @@ router.get('/', async (req, res) => {
     const skip = (page - 1) * limit;
 
     const search = req.query.search || "";
-    const sortBy = req.query.sortBy || "name"; // default: sort by name
-    const order = req.query.order === "desc" ? -1 : 1; // default: ascending
+    // const sortBy = req.query.sortBy || "name"; // default: sort by name
+    // const order = req.query.order === "desc" ? -1 : 1; // default: ascending
 
     // Search condition
     const searchQuery = {
