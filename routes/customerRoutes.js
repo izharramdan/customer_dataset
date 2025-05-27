@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
 
         // Cari data dengan skip & limit
         const data = await Customer.find()
-            .select('Name Email gender')  // ambil hanya kolom yang perlu
+            // .select('Name Email gender') 
             .skip(skip)
             .limit(limit)
             .lean();
