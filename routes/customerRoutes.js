@@ -16,6 +16,15 @@ router.get('/', async (req, res) => {
             .limit(limit)
             .lean();
 
+        // Ubah tahun lahir menjadi umur pada setiap data
+        const currentYear = new Date().getFullYear();
+        const dataWithAge = data.map(item => {
+            if (typeof item.age === 'number') {
+                return { ...item, age: currentYear - item.age };
+            }
+            return item;
+        });
+
         // Hitung total dokumen untuk pagination
         const total = await Customer.countDocuments();
 
@@ -23,7 +32,7 @@ router.get('/', async (req, res) => {
             currentPage: page,
             totalPages: Math.ceil(total / limit),
             totalData: total,
-            data
+            data: dataWithAge
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
