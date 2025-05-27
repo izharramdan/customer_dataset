@@ -27,6 +27,7 @@ router.get('/', async (req, res) => {
       .skip(skip)
       .limit(limit)
     //   .sort({ [sortBy]: order })
+    
       .lean();
 
     // Convert birth year to age
