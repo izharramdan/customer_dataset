@@ -99,19 +99,23 @@ router.get('/summary/interest', async (req, res) => {
 });
 router.get('/summary/age', async (req, res) => {
     try {
+        const currentYear = new Date().getFullYear();
         const summary = await Customer.aggregate([
             {
                 $group: {
-                    _id: "$age",
+                    _id: "$age", // _id di sini adalah tahun lahir
                     count: { $sum: 1 }
                 }
             }
         ]);
 
-        // Ubah bentuk hasil agar lebih rapi
+        // Ubah tahun lahir menjadi umur
         const formatted = {};
         summary.forEach(item => {
-            formatted[item._id] = item.count;
+            if (typeof item._id === 'number') {
+                const umur = currentYear - item._id;
+                formatted[umur] = (formatted[umur] || 0) + item.count;
+            }
         });
 
         res.json({ summary: formatted });
@@ -164,36 +168,36 @@ router.get('/summary/hour', async (req, res) => {
     }
 });
 router.get('/summary/date', async (req, res) => {
-  try {
-    const summary = await Customer.aggregate([
-      {
-        $project: {
-          formattedDate: {
-            $dateToString: { format: "%Y-%m-%d", date: "$date" }
-          }
-        }
-      },
-      {
-        $group: {
-          _id: "$formattedDate",
-          count: { $sum: 1 }
-        }
-      },
-      {
-        $sort: { _id: 1 }
-      }
-    ]);
+    try {
+        const summary = await Customer.aggregate([
+            {
+                $project: {
+                    formattedDate: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$date" }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$formattedDate",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { _id: 1 }
+            }
+        ]);
 
-    // Format response
-    const formatted = {};
-    summary.forEach(item => {
-      formatted[item._id] = item.count;
-    });
+        // Format response
+        const formatted = {};
+        summary.forEach(item => {
+            formatted[item._id] = item.count;
+        });
 
-    res.json({ summary: formatted });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+        res.json({ summary: formatted });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 router.get('/summary/locationtype', async (req, res) => {
