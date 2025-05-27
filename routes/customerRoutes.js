@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
     const data = await Customer.find(searchQuery)
       .skip(skip)
       .limit(limit)
-      .sort({ [sortBy]: order })
+    //   .sort({ [sortBy]: order })
       .lean();
 
     // Convert birth year to age
