@@ -53,5 +53,170 @@ router.get('/summary/gender', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+router.get('/summary/device', async (req, res) => {
+    try {
+        const summary = await Customer.aggregate([
+            {
+                $group: {
+                    _id: "$brand_device",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Ubah bentuk hasil agar lebih rapi
+        const formatted = {};
+        summary.forEach(item => {
+            formatted[item._id] = item.count;
+        });
+
+        res.json({ summary: formatted });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+router.get('/summary/interest', async (req, res) => {
+    try {
+        const summary = await Customer.aggregate([
+            {
+                $group: {
+                    _id: "$digital_interest",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Ubah bentuk hasil agar lebih rapi
+        const formatted = {};
+        summary.forEach(item => {
+            formatted[item._id] = item.count;
+        });
+
+        res.json({ summary: formatted });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+router.get('/summary/age', async (req, res) => {
+    try {
+        const summary = await Customer.aggregate([
+            {
+                $group: {
+                    _id: "$age",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Ubah bentuk hasil agar lebih rapi
+        const formatted = {};
+        summary.forEach(item => {
+            formatted[item._id] = item.count;
+        });
+
+        res.json({ summary: formatted });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+router.get('/summary/location', async (req, res) => {
+    try {
+        const summary = await Customer.aggregate([
+            {
+                $group: {
+                    _id: "$name_of_location",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Ubah bentuk hasil agar lebih rapi
+        const formatted = {};
+        summary.forEach(item => {
+            formatted[item._id] = item.count;
+        });
+
+        res.json({ summary: formatted });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+router.get('/summary/hour', async (req, res) => {
+    try {
+        const summary = await Customer.aggregate([
+            {
+                $group: {
+                    _id: "$login_hour",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Ubah bentuk hasil agar lebih rapi
+        const formatted = {};
+        summary.forEach(item => {
+            formatted[item._id] = item.count;
+        });
+
+        res.json({ summary: formatted });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+router.get('/summary/date', async (req, res) => {
+  try {
+    const summary = await Customer.aggregate([
+      {
+        $project: {
+          formattedDate: {
+            $dateToString: { format: "%Y-%m-%d", date: "$date" }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: "$formattedDate",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    // Format response
+    const formatted = {};
+    summary.forEach(item => {
+      formatted[item._id] = item.count;
+    });
+
+    res.json({ summary: formatted });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/summary/locationtype', async (req, res) => {
+    try {
+        const summary = await Customer.aggregate([
+            {
+                $group: {
+                    _id: "$location_type",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Ubah bentuk hasil agar lebih rapi
+        const formatted = {};
+        summary.forEach(item => {
+            formatted[item._id] = item.count;
+        });
+
+        res.json({ summary: formatted });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 module.exports = router;
