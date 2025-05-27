@@ -3,41 +3,54 @@ const router = express.Router();
 const Customer = require('../models/Customer');
 
 // GET all customers with pagination
+// GET all customers with pagination, search, and sort
 router.get('/', async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;     // default: page 1
-        const limit = parseInt(req.query.limit) || 50;  // default: 50 data per page
-        const skip = (page - 1) * limit;
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
 
-        // Cari data dengan skip & limit
-        const data = await Customer.find()
-            // .select('Name Email gender') 
-            .skip(skip)
-            .limit(limit)
-            .lean();
+    const search = req.query.search || "";
+    const sortBy = req.query.sortBy || "name"; // default: sort by name
+    const order = req.query.order === "desc" ? -1 : 1; // default: ascending
 
-        // Ubah tahun lahir menjadi umur pada setiap data
-        const currentYear = new Date().getFullYear();
-        const dataWithAge = data.map(item => {
-            if (typeof item.age === 'number') {
-                return { ...item, age: currentYear - item.age };
-            }
-            return item;
-        });
+    // Search condition
+    const searchQuery = {
+      $or: [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } }
+      ]
+    };
 
-        // Hitung total dokumen untuk pagination
-        const total = await Customer.countDocuments();
+    // Fetch data with search, pagination, and sort
+    const data = await Customer.find(searchQuery)
+      .skip(skip)
+      .limit(limit)
+      .sort({ [sortBy]: order })
+      .lean();
 
-        res.json({
-            currentPage: page,
-            totalPages: Math.ceil(total / limit),
-            totalData: total,
-            data: dataWithAge
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    // Convert birth year to age
+    const currentYear = new Date().getFullYear();
+    const dataWithAge = data.map(item => {
+      if (typeof item.age === 'number') {
+        return { ...item, age: currentYear - item.age };
+      }
+      return item;
+    });
+
+    const total = await Customer.countDocuments(searchQuery);
+
+    res.json({
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalData: total,
+      data: dataWithAge
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
 
 // Summary berdasarkan gender
 router.get('/summary/gender', async (req, res) => {
